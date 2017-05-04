@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 import operator
 from collections import Counter
+from terminaltables import AsciiTable
 
 def url(id):
     return f'https://candidates.democracyclub.org.uk/api/v0.9/persons/{id}/'
@@ -19,7 +20,9 @@ async def main():
 async def get_candidate_json_by_id(session, id):
     async with session.get(url(id)) as response:
         person = await response.json()
-        return extract_card(person)
+        card = extract_card(person)
+        table = create_table(card)
+        print(table.table)
 
 
 def extract_card(person):
@@ -33,9 +36,22 @@ def extract_card(person):
     except KeyError:
         party = None
 
-    return (name, gender, email, party)
+    if email:
+        score = score_email_address(email)
+    else:
+        score = None
+
+    return {
+        'name': name,
+        'gender': gender,
+        'email': email,
+        'party': party,
+        'score': score
+    }
 
 def create_table(card):
+    return AsciiTable([list(x) for x in card.items()])
+
 
 
 def score_email_address(email_address):
