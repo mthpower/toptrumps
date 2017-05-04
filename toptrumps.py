@@ -16,14 +16,17 @@ async def main():
 
 async def get_candidate_json_by_id(session, id):
     async with session.get(url(id)) as response:
-        return await response.json()
+        person = await response.json()
+        return extract_card(person)
 
 
 def extract_card(person):
     name = person['name']
     gender = person['gender']
     email = person['email']
-
+    party_memberships = person['party_memberships']
+    latest = max([int(k) for k in party_memberships.keys()])
+    print(latest)
 
 
 if __name__ == '__main__':
