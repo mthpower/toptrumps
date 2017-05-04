@@ -28,6 +28,17 @@ def extract_card(person):
     latest = max([int(k) for k in party_memberships.keys()])
     print(latest)
 
+def score_email_address(email_address):
+    email_providers_to_scores = {
+        'aol.com': 1,
+        'yahoo.com': 10,
+        'hotmail.com': 100,
+        'gmail.com': 1000,
+    }
+
+    _, email_provider = email_address.split('@')
+    return email_providers_to_scores.get(email_provider, 10000)
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
