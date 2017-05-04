@@ -28,6 +28,7 @@ def extract_card(person):
     latest = max([int(k) for k in party_memberships.keys()])
     print(latest)
 
+
 def score_email_address(email_address):
     email_providers_to_scores = {
         'aol.com': 1,
