@@ -11,7 +11,7 @@ def url(id):
 async def main():
     tasks = []
     async with aiohttp.ClientSession() as session:
-        for i in range(1, 200):
+        for i in range(1, 34000):
             tasks.append(get_candidate_json_by_id(session, i))
 
         return await asyncio.gather(*tasks)
@@ -29,12 +29,20 @@ def extract_card(person):
     name = person.get('name')
     gender = person.get('gender')
     email = person.get('email')
+    birth_date = person.get('birth_date')
+    death_date = person.get('death_date')
     try:
         party_memberships = person['versions'][0]['data']['party_memberships'].values()
         parties = Counter(m['name'] for m in party_memberships)
         party = sorted(parties.items(), key=operator.itemgetter(1))[0][0]
     except KeyError:
         party = None
+
+    try:
+        standing_in = person['versions'][0]['data']['standing_in'].values()
+        times_elected = sum(m.get('elected', False) for m in standing_in)
+    except (KeyError, AttributeError):
+        times_elected = None
 
     if email:
         score = score_email_address(email)
@@ -46,12 +54,14 @@ def extract_card(person):
         'gender': gender,
         'email': email,
         'party': party,
-        'score': score
+        'score': score,
+        'birth_date': birth_date,
+        'death_date': death_date,
+        'times_elected': times_elected,
     }
 
 def create_table(card):
     return AsciiTable([list(x) for x in card.items()])
-
 
 
 def score_email_address(email_address):
